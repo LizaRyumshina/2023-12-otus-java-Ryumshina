@@ -4,8 +4,11 @@ import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 
 plugins {
     idea
-    id("io.spring.dependency-management")
-    id("org.springframework.boot") apply false
+    id("fr.brouillard.oss.gradle.jgitver") //a java library using git that computes a git repository version based on a given configuration
+    id("io.spring.dependency-management") //плагин управления зависимостями от Spring
+    id("org.springframework.boot") apply false // фреймворк Spring Boot
+    id("name.remal.sonarlint") apply false //линтер
+    id("com.diffplug.spotless") apply false // для автоматического форматирования и поддержки стилевых правил кода.
 }
 
 idea {
@@ -19,7 +22,7 @@ idea {
 }
 
 
-allprojects {
+allprojects { //общие настройки для всех проектов
     group = "ru.otus"
 
     repositories {
@@ -30,9 +33,11 @@ allprojects {
     val testcontainersBom: String by project
     val protobufBom: String by project
     val guava: String by project
+    val jmh: String by project
+    val asm: String by project
 
     apply(plugin = "io.spring.dependency-management")
-    dependencyManagement {
+    dependencyManagement { //определение базовых версий зависимостей
         dependencies {
             imports {
                 mavenBom(BOM_COORDINATES)
@@ -40,14 +45,18 @@ allprojects {
                 mavenBom("com.google.protobuf:protobuf-bom:$protobufBom")
             }
             dependency("com.google.guava:guava:$guava")
+            dependency("org.openjdk.jmh:jmh-core:$jmh")
+            dependency("org.openjdk.jmh:jmh-generator-annprocess:$jmh")
+            dependency("org.ow2.asm:asm-commons:$asm")
         }
     }
 
-    configurations.all {
+    configurations.all { //для принудительного задания конкретных версий в случае конфликтов
         resolutionStrategy {
             failOnVersionConflict()
-
-            force("javax.servlet:servlet-api:2.4")
+            
+            // force -  принудительно задать требуемую версию для предотвращения возможных конфликтов в проекте
+            force("javax.servlet:servlet-api:2.4") //устанавливает принудительно версию 2.4 для зависимости javax.servlet:servlet-api
             force("commons-logging:commons-logging:1.1.1")
             force("commons-lang:commons-lang:2.5")
             force("org.codehaus.jackson:jackson-core-asl:1.8.8")
@@ -64,8 +73,8 @@ allprojects {
     }
 }
 
-subprojects {
-    plugins.apply(JavaPlugin::class.java)
+subprojects { // для всех проектов
+    plugins.apply(JavaPlugin::class.java) // применить плагин JavaPlugin
     extensions.configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -75,8 +84,35 @@ subprojects {
         options.encoding = "UTF-8"
         options.compilerArgs.addAll(listOf("-Xlint:all,-serial,-processing"))
     }
-}
 
+    apply<name.remal.gradle_plugins.sonarlint.SonarLintPlugin>()
+    apply<com.diffplug.gradle.spotless.SpotlessPlugin>()
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        java {
+            palantirJavaFormat("2.38.0")
+        }
+    }
+
+    plugins.apply(fr.brouillard.oss.gradle.plugins.JGitverPlugin::class.java)
+    extensions.configure<fr.brouillard.oss.gradle.plugins.JGitverPluginExtension> {
+        strategy("PATTERN")
+        nonQualifierBranches("main,master")
+        tagVersionPattern("\${v}\${<meta.DIRTY_TEXT}")
+        versionPattern(
+                "\${v}\${<meta.COMMIT_DISTANCE}\${<meta.GIT_SHA1_8}" +
+                        "\${<meta.QUALIFIED_BRANCH_NAME}\${<meta.DIRTY_TEXT}-SNAPSHOT"
+        )
+    }
+
+    tasks.withType<Test> { // Настройка задачи Test для выполнения тестов JUnit
+        useJUnitPlatform()
+        testLogging.showExceptions = true
+        reports {
+            junitXml.required.set(true)
+            html.required.set(true)
+        }
+    }
+}
 tasks {
     val managedVersions by registering {
         doLast {

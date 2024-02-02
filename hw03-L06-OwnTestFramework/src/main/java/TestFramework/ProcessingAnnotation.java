@@ -6,26 +6,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProcessingAnnotation {
-    public static void Run(String className, Statistic statistic) {
+    public static void run(String className, Statistic statistic) {
         try {
-            Class<?> clazz = Class.forName(className);
-            Object instance = clazz.getDeclaredConstructor().newInstance();
-            Method[] methods = clazz.getDeclaredMethods();
+            Class<?> clazzGeneral = Class.forName(className);
+            Method[] methods = clazzGeneral.getDeclaredMethods();
 
-            List<Method> methodsBefore = GetMethods(clazz, methods, Before.class);
-            List<Method> methodsAfter  = GetMethods(clazz, methods, After.class);
+            List<Method> methodsBefore = getMethods(clazzGeneral, methods, Before.class);
+            List<Method> methodsAfter  = getMethods(clazzGeneral, methods, After.class);
 
-            for(Method method: GetMethods(clazz, methods, Test.class)){
+            for(Method method: getMethods(clazzGeneral, methods, Test.class)){
+                Class<?> clazzTest = Class.forName(className);
+                Object instanceTest = clazzTest.getDeclaredConstructor().newInstance();
                 try {
-                    invokeMethods(instance, methodsBefore);
+                    invokeMethods(instanceTest, methodsBefore);
                     System.out.println("run method: "+className+"."+method.getName());
-                    method.invoke(instance);
-                    statistic.Passed();
+                    method.invoke(instanceTest);
+                    statistic.passed();
                 } catch (Exception e) {
                     System.out.println("Test failed: " + method.getName()+ ". Error: "+ e.getCause());
-                    statistic.Failed();
+                    statistic.failed();
                 } finally {
-                    invokeMethods(instance, methodsAfter);
+                    invokeMethods(instanceTest, methodsAfter);
                 }
             }
         } catch ( Exception e) {
@@ -33,7 +34,7 @@ public class ProcessingAnnotation {
         }
     }
 
-    private static List<Method> GetMethods(Class<?> clazz, Method[] methods, Class<? extends Annotation> annotation) {
+    private static List<Method> getMethods(Class<?> clazz, Method[] methods, Class<? extends Annotation> annotation) {
         List<Method> result = new ArrayList<>();
         for(int i =0; i<methods.length;i++){
             if(methods[i]!= null && methods[i].isAnnotationPresent(annotation)){

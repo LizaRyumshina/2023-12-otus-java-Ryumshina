@@ -7,11 +7,11 @@ public class RunTests {
         System.out.println("Processing started");
         System.out.println("--------------------------------");
         Statistic statistic = new Statistic();
-        ProcessingAnnotation.Run("BaseObjects.TF_CardManager", statistic);
-        ProcessingAnnotation.Run("BaseObjects.TF_Customer", statistic);
-        ProcessingAnnotation.Run("BaseObjects.TF_Card", statistic);
+        ProcessingAnnotation.run("BaseObjects.TF_CardManager", statistic);
+        ProcessingAnnotation.run("BaseObjects.TF_Customer", statistic);
+        ProcessingAnnotation.run("BaseObjects.TF_Card", statistic);
         System.out.println("--------------------------------");
-        statistic.PrintStatistics();
+        statistic.printStatistics();
         System.out.println("--------------------------------");
         System.out.println("Processing finished");
         System.out.println("--------------------------------");

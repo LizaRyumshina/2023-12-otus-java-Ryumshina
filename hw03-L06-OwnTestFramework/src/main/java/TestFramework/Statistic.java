@@ -15,15 +15,15 @@ public class Statistic {
     public int getPassed(){
         return total;
     }
-    public void Passed(){
+    public void passed(){
         passed++;
         total++;
     }
-    public void Failed(){
+    public void failed(){
         failed++;
         total++;
     }
-    public void PrintStatistics(){
+    public void printStatistics(){
         System.out.println("totalTests:  "+  total);
         System.out.println("passedTests: "+  passed+" - "+Math.round((double)passed/total*100)+"%");
         System.out.println("failedTests: "+  failed+" - "+Math.round((double)failed/total*100)+"%");

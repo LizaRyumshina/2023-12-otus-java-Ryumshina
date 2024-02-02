@@ -13,7 +13,7 @@ public abstract class BaseObject {
     public int getId() {
         return this.id;
     }
-    protected void SetId(int id) {
+    protected void setId(int id) {
         this.id = id;
     }
     public Date getCreateDate() {

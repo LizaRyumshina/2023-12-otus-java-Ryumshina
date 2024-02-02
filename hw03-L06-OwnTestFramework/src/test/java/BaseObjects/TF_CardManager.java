@@ -27,7 +27,7 @@ public class TF_CardManager {
         }
     }
     @Test(hint = "Check add null card to customer")
-    public void CheckEmptyCard(){
+    public void testCheckEmptyCard(){
         Customer customer2 = new Customer("Anna");
         try{
             cardManager.addCardToCustomer(customer2, null);

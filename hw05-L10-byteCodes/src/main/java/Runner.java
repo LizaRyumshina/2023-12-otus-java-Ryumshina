@@ -9,9 +9,10 @@ public class Runner {
         MoneyBoxInterface piggyBank = Ioc.createPiggyBank();
         //for (int i =0; i<=100000; i++){
         piggyBank.addMoney(10);
-        piggyBank.addMoney(10, 20, 25);
         piggyBank.addMoney(25, 20);
-        piggyBank.withdrawMoney(25);
+        piggyBank.addMoney(10, 20, 25);
+        piggyBank.withdrawMoney(10);
+        System.out.println("Balance:"+piggyBank.getBalance());
         //}
         long delta = System.currentTimeMillis() - startTime;
         System.out.println("spend msec:" + delta + ", sec:" + (delta / 1000));

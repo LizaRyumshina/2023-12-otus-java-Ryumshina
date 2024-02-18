@@ -9,11 +9,23 @@ public class PiggyBank implements MoneyBoxInterface {
         balance = 0;
     }
     @Log
-    public void addMoney(int amount) {
-        if (amount <= 0) {
+    public void addMoney(int amount1) {
+        if (amount1 <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
-        balance += amount;
+        balance += amount1;
+    }
+
+    public void addMoney(int amount1, int amount2) {
+        addMoney(amount1);
+        addMoney(amount2);
+    }
+
+    @Log
+    public void addMoney(int amount1, int amount2, int amount3) {
+        addMoney(amount1);
+        addMoney(amount2);
+        addMoney(amount3);
     }
     @Log
     public void withdrawMoney(int amount) {
@@ -22,14 +34,7 @@ public class PiggyBank implements MoneyBoxInterface {
         }
         balance -= amount;
     }
-
     @Log
-    public void addMoney(int... amounts) {
-        for(int amount: amounts){
-            addMoney(amount);
-        }
-    }
-
     public int getBalance() {
         return balance;
     }

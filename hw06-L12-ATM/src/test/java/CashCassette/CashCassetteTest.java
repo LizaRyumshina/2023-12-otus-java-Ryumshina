@@ -9,12 +9,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CashCassetteTest {
-    Banknote banknote;
     CashCassette cashCassette;
     @BeforeEach
     void createCashCassetteTest() {
-        banknote = new Banknote(1000);
-        cashCassette = new CashCassette(banknote, 100);
+        cashCassette = new CashCassette(Banknote.Denomination_1000, 100);
     }
     @Test
     void addRemoveCashCassetteTest() {
@@ -31,7 +29,7 @@ public class CashCassetteTest {
 
     @Test
     void maxCountCashCassetteTest() {
-        CashCassette cshCassette = new CashCassette(banknote, 10);
+        CashCassette cshCassette = new CashCassette(Banknote.Denomination_1000, 10);
         int banknotes = 123;
         assertThrows(Throwable.class, () -> {
             cshCassette.addBanknotes(banknotes);

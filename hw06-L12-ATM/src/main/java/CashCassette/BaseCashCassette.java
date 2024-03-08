@@ -1,8 +1,5 @@
 package CashCassette;
 
-import ATM.BaseATM;
-import Banknote.Banknote;
-
 public interface BaseCashCassette {
     public void setOwnerATM (int idATM);
     public int getOwnerATM ();

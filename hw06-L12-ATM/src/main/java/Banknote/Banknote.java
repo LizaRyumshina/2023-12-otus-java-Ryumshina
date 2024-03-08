@@ -1,24 +1,30 @@
 package Banknote;
 
-public class Banknote implements BaseBanknote {
-    private final int denomination;
-
-    public Banknote(int denomination) {
-        if (denomination <0){
-            throw new RuntimeException("The denomination is less than zero. denomination:"+denomination);
+public enum Banknote {
+    Denomination_100 {
+        @Override
+        public int getDenomination() {
+            return 100;
         }
-        this.denomination = denomination;
-    }
-    @Override
-    public int getDenomination() {
-        return denomination;
-    }
-    public Banknote clone(){
-        return new Banknote(this.denomination);
-    }
+    },
+    Denomination_500 {
+        @Override
+        public int getDenomination() {
+            return 500;
+        }
+    },
+    Denomination_1000 {
+        @Override
+        public int getDenomination() {
+            return 1000;
+        }
+    },
+    Denomination_5000 {
+        @Override
+        public int getDenomination() {
+            return 5000;
+        }
+    };
 
-    @Override
-    public String toString() {
-        return String.valueOf(this.denomination);
-    }
+    public abstract int getDenomination();
 }

@@ -253,16 +253,11 @@ public class Message {
         }
 
         public Message build() {
-            return new Message(id, field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, field11, field12, field13);
+            ObjectForMessage newField13 = null;
+            if (field13 != null){
+                newField13 = field13.clone();
+            }
+            return new Message(id, field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, field11, field12, newField13);
         }
-    }
-    public Message clone (){
-        Message message;
-        if (field13 != null){
-            message = this.toBuilder().field13(this.getField13().clone()).build();
-        }else{
-            message = this.toBuilder().build();
-        }
-        return message;
     }
 }

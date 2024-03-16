@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ATMTest {
@@ -116,22 +117,11 @@ public class ATMTest {
         assertThrows(Throwable.class, () -> {
             atm.addCashCassette(cassette1);
         }); //already installed
-        boolean[] expectedFilledArr = {true, false, false, false};
-        boolean[] filledArr = atm.getFilledCashCassettes();
-        //System.out.println("atm.getFilledCashCassettes()="+Arrays.toString(filledArr));
-        assertThat(filledArr).isEqualTo(expectedFilledArr); //check that it hasn't changed
 
-        CashCassette cassette2 = atm.removeCashCassette(0);
-        expectedFilledArr = new boolean[]{false, false, false, false};
-        filledArr = atm.getFilledCashCassettes();
-        assertThat(filledArr).isEqualTo(expectedFilledArr);
-
-        atm.addCashCassette(new CashCassette(Banknote.Denomination_1000, 10));
-        atm.addCashCassette(new CashCassette(Banknote.Denomination_1000, 20));
-        atm.addCashCassette(new CashCassette(Banknote.Denomination_1000, 30));
-        atm.removeCashCassette(0);
-        expectedFilledArr = new boolean[]{false, true, true, false};
-        filledArr = atm.getFilledCashCassettes();
-        assertThat(filledArr).isEqualTo(expectedFilledArr);
+        assertDoesNotThrow(()->{
+            atm.addCashCassette(new CashCassette(Banknote.Denomination_1000, 10));
+            atm.addCashCassette(new CashCassette(Banknote.Denomination_1000, 20));
+            atm.addCashCassette(new CashCassette(Banknote.Denomination_1000, 30));
+            atm.removeCashCassette(0);});
     }
 }

@@ -13,14 +13,14 @@ public class ATM implements HaveCassette {
     private static int globalID = 1;
     private final int id;
     private final int maxCountCassette;
-    private CashCassette[] cashCassettes;
+    private List<CashCassette> sortedByDenominationCassettes;
 
     public ATM(int maxCountCassette) {
         this.id = globalID;
         globalID++;
         logger.debug("create {}, maxCountCassette = {}", this.id, maxCountCassette);
         this.maxCountCassette = maxCountCassette;
-        this.cashCassettes = new CashCassette[maxCountCassette];
+        sortedByDenominationCassettes = new ArrayList<>();
     }
 
     public int getId() {
@@ -30,49 +30,29 @@ public class ATM implements HaveCassette {
     @Override
     public void addCashCassette(CashCassette cashCassette) {
         logger.debug("addCashCassette into {}, cashCassette = {}", this.id, cashCassette.toString());
-        int position = findEmptyPositionCassette();
         cashCassette.setOwnerATM(this.getId());
-        cashCassettes[position] = cashCassette.clone();
-    }
-
-    private int findEmptyPositionCassette() {
-        logger.debug("findEmptyPositionCassette inside {}", this.id);
-        for (int i = 0; i < maxCountCassette; i++) {
-            if (!isFilledPlaceCassette(i)) {
-                return i;
-            }
+        if (sortedByDenominationCassettes.size()+1<=maxCountCassette){
+            sortedByDenominationCassettes.add(cashCassette.clone());
         }
-        throw new RuntimeException("There are no free place for new cassette.");
+        sortedByDenominationCassettes.sort((c1, c2) -> Integer.compare(c2.getDenomination(), c1.getDenomination()));
     }
 
     @Override
     public CashCassette removeCashCassette(int position) {
         logger.debug("removeCashCassette from {}, position={}", this.id, position);
         if (isFilledPlaceCassette(position)) {
-            CashCassette cashCassette =  cashCassettes[position].clone();
-            cashCassettes[position] = null;
+            CashCassette cashCassette = sortedByDenominationCassettes.get(position).clone();
+            sortedByDenominationCassettes.remove(position);
             return cashCassette;
         } else {
             throw new RuntimeException("There is no cassette in the position =" + position);
         }
     }
 
-    public boolean[] getFilledCashCassettes() {
-        boolean[] isFilledPlaceCassette = new boolean[maxCountCassette];
-        for (int i = 0; i < maxCountCassette; i++) {
-            if (cashCassettes[i] == null) {
-                isFilledPlaceCassette[i] = false;
-            } else {
-                isFilledPlaceCassette[i] = cashCassettes[i].isInsideATM();
-            }
-        }
-        return isFilledPlaceCassette;
-    }
-
     public CashCassette getCashCassettes(int position) {
         logger.debug("getCashCassettes from {}, position={}", this.id, position);
-        if (isFilledPlaceCassette(position)) {
-            return cashCassettes[position].clone();
+        if (position < maxCountCassette) {
+            return sortedByDenominationCassettes.get(position).clone();
         } else {
             throw new RuntimeException("There is no cassette in the position =" + position);
         }
@@ -83,10 +63,7 @@ public class ATM implements HaveCassette {
         if (position < 0 && position >= maxCountCassette) {
             throw new RuntimeException("Wrong position =" + position);
         }
-        if (cashCassettes[position] == null) {
-            return false;
-        }
-        return cashCassettes[position].isInsideATM();
+        return sortedByDenominationCassettes.get(position).isInsideATM();
     }
 
     @Override
@@ -97,13 +74,6 @@ public class ATM implements HaveCassette {
         }
         int remainingAmount = amount;
         List<CounterBanknotes> counterBanknotes = new ArrayList<>();
-        List<CashCassette> sortedByDenominationCassettes = new ArrayList<>();
-        for (int i = 0; i < maxCountCassette; i++) {
-            if (isFilledPlaceCassette(i)) {
-                sortedByDenominationCassettes.add(cashCassettes[i]);
-            }
-        }
-        sortedByDenominationCassettes.sort((c1, c2) -> Integer.compare(c2.getDenomination(), c1.getDenomination()));
         for (CashCassette cassette : sortedByDenominationCassettes) {
             int banknotesCount = remainingAmount / cassette.getDenomination();
             if (banknotesCount > cassette.getCurrCountBanknote()) {
@@ -133,8 +103,8 @@ public class ATM implements HaveCassette {
     public void depositCash(Banknote banknote, int count) {
         logger.debug("depositCash inside {}, banknote={}, count={}", this.id, banknote.toString(), count);
         for (int i = 0; i < maxCountCassette; i++) {
-            if (isFilledPlaceCassette(i) && cashCassettes[i].getDenomination() == banknote.getDenomination()) {
-                cashCassettes[i].addBanknotes(count);
+            if (isFilledPlaceCassette(i) && sortedByDenominationCassettes.get(i).getDenomination() == banknote.getDenomination()) {
+                sortedByDenominationCassettes.get(i).addBanknotes(count);
                 return;
             }
         }
@@ -161,7 +131,7 @@ public class ATM implements HaveCassette {
     public int getBalanceCash() {
         logger.debug("getBalanceCash of {}", this.id);
         int vBalance = 0;
-        for (int i = 0; i < maxCountCassette; i++) {
+        for (int i = 0; i < sortedByDenominationCassettes.size(); i++) {
             vBalance += getBalanceCashCassette(i);
         }
         return vBalance;

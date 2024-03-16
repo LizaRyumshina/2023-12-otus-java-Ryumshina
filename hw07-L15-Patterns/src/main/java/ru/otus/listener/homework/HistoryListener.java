@@ -1,18 +1,26 @@
 package ru.otus.listener.homework;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+
 import ru.otus.listener.Listener;
 import ru.otus.model.Message;
 
 public class HistoryListener implements Listener, HistoryReader {
+    private Map<Long, Message> messages;
+
+    public HistoryListener() {
+        messages = new HashMap<>();
+    }
 
     @Override
     public void onUpdated(Message msg) {
-        throw new UnsupportedOperationException();
+        messages.put(msg.getId(), msg.clone());
     }
 
     @Override
     public Optional<Message> findMessageById(long id) {
-        throw new UnsupportedOperationException();
+        return Optional.ofNullable(messages.get(id));
     }
 }

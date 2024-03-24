@@ -45,7 +45,11 @@ public class Message {
         this.field10 = field10;
         this.field11 = field11;
         this.field12 = field12;
-        this.field13 = field13;
+        if (field13 != null){
+            this.field13 = field13.clone();
+        }else{
+            this.field13 = null;
+        }
     }
 
     public long getId() {
@@ -253,11 +257,7 @@ public class Message {
         }
 
         public Message build() {
-            ObjectForMessage newField13 = null;
-            if (field13 != null){
-                newField13 = field13.clone();
-            }
-            return new Message(id, field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, field11, field12, newField13);
+            return new Message(id, field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, field11, field12, field13);
         }
     }
 }

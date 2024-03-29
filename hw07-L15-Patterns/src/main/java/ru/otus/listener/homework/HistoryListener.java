@@ -16,7 +16,7 @@ public class HistoryListener implements Listener, HistoryReader {
 
     @Override
     public void onUpdated(Message msg) {
-        messages.put(msg.getId(), msg.toBuilder().build());
+        messages.put(msg.getId(), msg.clone());
     }
 
     @Override

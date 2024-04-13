@@ -8,14 +8,18 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.otus.core.repository.DataTemplate;
 import ru.otus.core.repository.executor.DbExecutor;
+import ru.otus.demo.DbServiceDemo;
 
 /**
  * Сохратяет объект в базу, читает объект из базы
  */
 @SuppressWarnings("java:S1068")
 public class DataTemplateJdbc<T> implements DataTemplate<T> {
+    private static final Logger log = LoggerFactory.getLogger(DataTemplateJdbc.class);
 
     private final DbExecutor dbExecutor;
     private final EntitySQLMetaData entitySQLMetaData;
@@ -35,6 +39,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                     return getResultFields(resultSet);
                 }
             } catch (SQLException e) {
+                log.error("Error: findById id =" + id);
                 throw new RuntimeException(e);
             }
             return null;
@@ -51,15 +56,23 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 String columnName = rs.getMetaData().getColumnName(i);
                 Field field = fields.get(columnName);
 
-                field.setAccessible(true);
-                field.set(obj, rs.getObject(i));
+                setField(field, obj, rs.getObject(i));
             }
         } catch (Exception e) {
+            log.error("Error: getResultFields");
             throw new RuntimeException(e);
         }
         return obj;
     }
-
+    private void setField(Field field, Object obj, Object value) {
+        try {
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (IllegalAccessException e) {
+            log.error("Error: setField");
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public List<T> findAll(Connection connection) {
         List<T> objs = null;
@@ -72,10 +85,12 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                     }
                     return result;
                 } catch (SQLException e) {
+                    log.error("Error: findAll (get values) ");
                     throw new RuntimeException(e);
                 }
             });
         } catch (Exception e) {
+            log.error("Error: findAll (execute select) ");
             throw new RuntimeException(e);
         }
         return objs;
@@ -89,25 +104,23 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     private List<Object> getValuesOfFields(T client, Boolean isAddIdField) {
         List<Object> values = new ArrayList<>();
         for (Field field : entityClassMetaData.getFieldsWithoutId()) {
-            try {
-                field.setAccessible(true);
-                values.add(field.get(client));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+            values.add(getField(field, client));
         }
         if (isAddIdField) {
-            try {
-                Field field = entityClassMetaData.getIdField();
-                field.setAccessible(true);
-                values.add(field.get(client));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+            Field field = entityClassMetaData.getIdField();
+            values.add(getField(field, client));
         }
         return values;
     }
-
+    private Object getField(Field field, T client) {
+        try {
+            field.setAccessible(true);
+            return field.get(client);
+        } catch (IllegalAccessException e) {
+            log.error("Error: getField");
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public void update(Connection connection, T client) {
         dbExecutor.executeStatement(connection, entitySQLMetaData.getUpdateSql(), getValuesOfFields(client, true));

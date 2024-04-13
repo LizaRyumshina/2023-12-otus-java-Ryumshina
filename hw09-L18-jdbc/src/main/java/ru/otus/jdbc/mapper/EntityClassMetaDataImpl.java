@@ -1,18 +1,22 @@
 package ru.otus.jdbc.mapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class EntityClassMetaDataImpl implements EntityClassMetaData {
-    private Class<?> clazz;
-    private Constructor constructor;
+public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
+    private static final Logger log = LoggerFactory.getLogger(EntityClassMetaDataImpl.class);
+    private Class<T> clazz;
+    private Constructor<T> constructor;
     private Field idField;
     private List<Field> fields;
 
-    public EntityClassMetaDataImpl(Class<?> clazz) {
+    public EntityClassMetaDataImpl(Class<T> clazz) {
         this.clazz = clazz;
     }
 
@@ -22,11 +26,12 @@ public class EntityClassMetaDataImpl implements EntityClassMetaData {
     }
 
     @Override
-    public Constructor getConstructor() {
+    public Constructor<T> getConstructor() {
         if (constructor == null) {
             try {
                 constructor = clazz.getConstructor();
             } catch (NoSuchMethodException e) {
+                log.error("Error: getConstructor (try to get and set constructor)");
                 throw new RuntimeException(e);
             }
         }

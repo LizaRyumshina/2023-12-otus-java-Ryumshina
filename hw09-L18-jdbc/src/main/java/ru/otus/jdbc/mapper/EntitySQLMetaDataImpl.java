@@ -1,10 +1,13 @@
 package ru.otus.jdbc.mapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
 public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
-    private EntityClassMetaData entityClassMetaData;
+    private final EntityClassMetaData<?> entityClassMetaData;
 
     public EntitySQLMetaDataImpl(EntityClassMetaData<?> entityClassMetaData) {
         this.entityClassMetaData = entityClassMetaData;
@@ -20,7 +23,7 @@ public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
         return getSelect(true);
     }
 
-    private String getSelect(Boolean isFilterById) {
+    private String getSelect(boolean isFilterById) {
         StringBuilder sb = new StringBuilder();
         sb.append("select ").append("* ");
         sb.append("from ").append(entityClassMetaData.getName()).append(" ");

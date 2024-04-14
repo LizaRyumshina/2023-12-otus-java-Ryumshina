@@ -1,12 +1,7 @@
 package ru.otus.crm.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,13 +15,16 @@ import lombok.Setter;
 public class Client implements Cloneable {
 
     @Id
-    @SequenceGenerator(name = "client_gen", sequenceName = "client_seq", initialValue = 1, allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_gen")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @Column(name = "name")
     private String name;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Address address;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "client") // field client from Phone
+    private List<Phone> phones;
 
     public Client(String name) {
         this.id = null;
@@ -39,13 +37,26 @@ public class Client implements Cloneable {
     }
 
     public <E> Client(Long id, String name, Address address, List<Phone> phones) {
-        throw new UnsupportedOperationException();
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.phones = phones;
+        for (Phone phone : this.phones){
+            phone.setClient(this);
+        }
     }
 
     @Override
     @SuppressWarnings({"java:S2975", "java:S1182"})
     public Client clone() {
-        return new Client(this.id, this.name);
+        Client client =  new Client(this.id, this.name);
+        Address addressClone = address.clone();
+        client.setAddress(addressClone);
+        List<Phone> phonesClone = this.phones.stream()
+                .map(phone -> phone.clone(client))
+                .toList();
+        client.setPhones(phonesClone);
+        return client;
     }
 
     @Override

@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import org.h2.tools.Console;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -29,8 +32,6 @@ class HomeworkTest {
     private Metadata metadata;
     private SessionFactory sessionFactory;
 
-    // Кроме удаления @Disabled, тестовый класс менять нельзя
-
     @BeforeEach
     public void setUp() {
         makeTestDependencies();
@@ -41,7 +42,6 @@ class HomeworkTest {
         sessionFactory.close();
     }
 
-    @Disabled("Удалить при выполнении ДЗ")
     @Test
     void testHomeworkRequirementsForTablesCount() {
 
@@ -51,7 +51,6 @@ class HomeworkTest {
         assertThat(tables).hasSize(3);
     }
 
-    @Disabled("Удалить при выполнении ДЗ")
     @Test
     void testHomeworkRequirementsForUpdatesCount() {
         applyCustomSqlStatementLogger(new SqlStatementLogger(true, false, false, 0) {
@@ -61,25 +60,23 @@ class HomeworkTest {
                 assertThat(statement).doesNotContain("update");
             }
         });
-
         var client = new Client(
                 null,
                 "Vasya",
                 new Address(null, "AnyStreet"),
                 List.of(new Phone(null, "13-555-22"), new Phone(null, "14-666-333")));
+
         try (var session = sessionFactory.openSession()) {
             session.getTransaction().begin();
             session.persist(client);
             session.getTransaction().commit();
 
             session.clear();
-
             var loadedClient = session.find(Client.class, 1L).clone();
             assertThat(loadedClient).usingRecursiveComparison().isEqualTo(client);
         }
     }
 
-    @Disabled("Удалить при выполнении ДЗ")
     @Test
     void testForHomeworkRequirementsForClientReferences() throws Exception {
         var client = new Client(
@@ -90,7 +87,6 @@ class HomeworkTest {
         assertThatClientHasCorrectReferences(client);
     }
 
-    @Disabled("Удалить при выполнении ДЗ")
     @Test
     void testForHomeworkRequirementsForClonedClientReferences() throws Exception {
         var client = new Client(

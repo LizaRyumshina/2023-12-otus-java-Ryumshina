@@ -7,6 +7,7 @@ include("hw05-L10-byteCodes")
 include("hw06-L12-ATM")
 include("hw07-L15-Patterns")
 include("hw08-L16-io")
+include("hw09-L18-jdbc")
 
 pluginManagement {
     val jgitver: String by settings

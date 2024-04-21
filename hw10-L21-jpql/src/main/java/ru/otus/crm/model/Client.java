@@ -6,6 +6,8 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Getter
 @Setter
@@ -23,27 +25,21 @@ public class Client implements Cloneable {
     private String name;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Address address;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "client") // field client from Phone
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "client_id", nullable = false, updatable = false)
+    @Fetch(FetchMode.JOIN)
     private List<Phone> phones;
-
-    public Client(String name) {
-        this.id = null;
-        this.name = name;
-    }
 
     public Client(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public <E> Client(Long id, String name, Address address, List<Phone> phones) {
+    public Client(Long id, String name, Address address, List<Phone> phones) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.phones = phones;
-        for (Phone phone : this.phones){
-            phone.setClient(this);
-        }
     }
 
     @Override
@@ -53,7 +49,7 @@ public class Client implements Cloneable {
         Address addressClone = address.clone();
         client.setAddress(addressClone);
         List<Phone> phonesClone = this.phones.stream()
-                .map(phone -> phone.clone(client))
+                .map(phone -> phone.clone())
                 .toList();
         client.setPhones(phonesClone);
         return client;

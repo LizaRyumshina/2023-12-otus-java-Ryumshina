@@ -22,16 +22,7 @@ public class Phone {
     @Column(name = "number")
     private String number;
 
-    @ManyToOne
-    @JoinColumn(name="client_id")
-    private Client client;
-
-    public Phone(Long id, String number) {
-        this.id = id;
-        this.number = number;
-    }
-
-    public Phone clone(Client client){
-        return new Phone(this.id, this.number, client);
+    public Phone clone(){
+        return new Phone(this.id, this.number);
     }
 }

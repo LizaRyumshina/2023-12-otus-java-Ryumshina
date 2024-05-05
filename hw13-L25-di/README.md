@@ -12,6 +12,19 @@
 
   Дополнительное задание:
     В AppComponentsContainerImpl добавить конструктор, который принимает на вход имя пакета, и обрабатывает все имеющиеся там классы-конфигурации (см. зависимости в pom.xml)
-    
+
+
+
 Комментарий к разработке:
   За основу взят L25-di из https://github.com/petrelevich/otus_java_2023_12. Приложение тренажер таблицы умножения.
+  
+ Программа использует два файла конфигурации: AppConfig1 и AppConfig2, порядок обработки которых задается с использованием атрибута `@AppComponentsContainerConfig(order = 2)`. Существует два способа сборки приложения:
+  1. Использование одного или нескольких файлов конфигурации:
+  ``` java
+    AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig1.class, AppConfig2.class);
+  ```
+  2. Использование определенного пакета для сканирования:
+  ``` java
+    AppComponentsContainer container = new AppComponentsContainerImpl("ru.otus.config");
+  ```
+  Пакет "ru.otus.config" будет отсканирован для поиска файлов конфигурации, и все найденные классы будут использоваться для настройки.

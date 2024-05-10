@@ -119,7 +119,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
         for (Method method : configClass.getDeclaredMethods()) {
             log.info("method name = {}", method.getName());
             if (method.isAnnotationPresent(AppComponent.class)) {
-                log.info(method.getName() + " is annotated");
+                log.info("{} is annotated", method.getName());
                 methods.add(method);
             }
         }
@@ -146,7 +146,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     @Override
     public <C> C getAppComponent(String componentName) {
-        log.info("getAppComponent string = " + componentName);
+        log.info("getAppComponent string = {}", componentName);
         Object object = appComponentsByName.get(componentName);
         if (Objects.isNull(object)) {
             log.error("getAppComponent is null for {}", componentName);

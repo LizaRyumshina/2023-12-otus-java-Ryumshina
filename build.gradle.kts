@@ -35,6 +35,7 @@ allprojects { //общие настройки для всех проектов
     val guava: String by project
     val jmh: String by project
     val asm: String by project
+    val reflections: String by project
 
     apply(plugin = "io.spring.dependency-management")
     dependencyManagement { //определение базовых версий зависимостей
@@ -48,6 +49,8 @@ allprojects { //общие настройки для всех проектов
             dependency("org.openjdk.jmh:jmh-core:$jmh")
             dependency("org.openjdk.jmh:jmh-generator-annprocess:$jmh")
             dependency("org.ow2.asm:asm-commons:$asm")
+
+            dependency("org.reflections:reflections:$reflections")
         }
     }
 

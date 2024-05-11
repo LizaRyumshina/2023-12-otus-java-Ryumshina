@@ -38,6 +38,7 @@ allprojects { //общие настройки для всех проектов
     val jetty: String by project
     val freemarker: String by project
 
+    val reflections: String by project
 
     apply(plugin = "io.spring.dependency-management")
     dependencyManagement { //определение базовых версий зависимостей
@@ -51,7 +52,7 @@ allprojects { //общие настройки для всех проектов
             dependency("org.openjdk.jmh:jmh-core:$jmh")
             dependency("org.openjdk.jmh:jmh-generator-annprocess:$jmh")
             dependency("org.ow2.asm:asm-commons:$asm")
-            
+
             dependency("org.eclipse.jetty.ee10:jetty-ee10-servlet:$jetty")
             dependency("org.eclipse.jetty:jetty-server:$jetty")
             dependency("org.eclipse.jetty.ee10:jetty-ee10-webapp:$jetty")
@@ -61,6 +62,7 @@ allprojects { //общие настройки для всех проектов
             dependency("org.eclipse.jetty:jetty-util:$jetty")
             dependency("org.freemarker:freemarker:$freemarker")
 
+            dependency("org.reflections:reflections:$reflections")
         }
     }
 

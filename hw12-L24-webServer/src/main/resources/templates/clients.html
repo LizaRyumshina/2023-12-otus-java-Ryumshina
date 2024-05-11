@@ -1,0 +1,88 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Клиенты</title>
+    <style>
+        body {
+         font-family: Arial, sans-serif;
+         background-color: #f4f4f4;
+         display: flex;
+         height: 100vh;
+         margin: 0;
+         }
+         .top {
+         background-color: #fff;
+         padding: 20px;
+         border-radius: 10px;
+         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+         }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        input, label, h4 {
+          margin-bottom: 10px;
+        }
+                input[type=addClient] {
+          background-color: #4CAF50; /* Зеленый цвет */
+          color: white;
+          padding: 10px 20px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 2px;
+          transition-duration: 0.4s;
+          cursor: pointer;
+          border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="top">
+    <h4>Создать клиента</h4>
+    <br/>
+    <form action="/clients" method="post">
+        <label>Имя:</label>
+        <input type="text" name="name">
+        <br/>
+        <label>Адрес:</label>
+        <input type="text" name="address">
+        <br/>
+        <label>Телефон:</label>
+        <input type="text" name="phone">
+        <br/>
+        <input type="submit" value="Добавить">
+        <br/>
+    </form>
+</div>
+<br/>
+<div class="top">
+    <h4>Клиенты:</h4>
+    <table style="width: 800px">
+        <thead>
+        <tr>
+            <td style="width: 50px">Id</td>
+            <td style="width: 150px">Имя</td>
+            <td style="width: 150px">Адрес</td>
+            <td style="width: 100px">Телефон</td>
+        </tr>
+        </thead>
+        <tbody>
+        <#list clients as client>
+            <tr>
+                <td>${client.id}</td>
+                <td>${client.name}</td>
+                <td>${client.address.street}</td>
+                <td>
+                    <#list client.phones as phone>
+                        <div>${phone.number}</div>
+                    </#list>
+                </td>
+            </tr>
+            </#list>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

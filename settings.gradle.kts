@@ -12,6 +12,7 @@ include("hw10-L21-jpql")
 include("hw11-L22-cache")
 include("hw12-L24-webServer")
 include("hw13-L25-di")
+include("hw14-L28-springDataJdbc")
 
 pluginManagement {
     val jgitver: String by settings

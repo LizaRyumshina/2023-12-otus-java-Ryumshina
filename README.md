@@ -18,3 +18,4 @@
 11. hw11-L22-cache - добавлен кэш (продолжение hw10-L21-jpql)
 12. hw12-L24-webServer - добавлен веб сервер (продолжение hw11-L22-cache)
 13. hw13-L25-di - cобственный IoC контейнер
+14. hw14-L28-springDataJdbc - добавлен Spring (продолжение hw12-L24-webServer)

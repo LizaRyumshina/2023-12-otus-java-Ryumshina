@@ -37,18 +37,18 @@ public class DbServiceClientImpl implements DBServiceClient {
             return savedClient;
         });
     }
-
     @Override
     public Optional<Client> getClient(long id) {
         Optional<Client> client = Optional.ofNullable(cacheClients.get(String.valueOf(id)));
         if (client.isEmpty()){
             client = transactionManager.doInReadOnlyTransaction(session -> {
                 var clientOptional = clientDataTemplate.findById(session, id);
-                log.info("client: {}", clientOptional);
-                cacheClients.put(String.valueOf(id), clientOptional.get().clone());
+                log.info("clientOptional: {}", clientOptional);
+                clientOptional.ifPresent(c -> cacheClients.put(String.valueOf(id), c.clone()));
                 return clientOptional;
             });
-            cacheClients.put(String.valueOf(client.get().getId()), client.get().clone());
+
+            client.ifPresent(c -> cacheClients.put(String.valueOf(c.getId()), c.clone()));
         }
         return client;
     }

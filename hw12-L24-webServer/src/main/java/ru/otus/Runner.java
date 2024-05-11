@@ -12,6 +12,7 @@ import ru.otus.crm.dbmigrations.MigrationsExecutorFlyway;
 import ru.otus.crm.model.Address;
 import ru.otus.crm.model.Client;
 import ru.otus.crm.model.Phone;
+import ru.otus.crm.service.DBServiceClient;
 import ru.otus.crm.service.DbServiceClientImpl;
 import ru.otus.webServer.dao.InMemoryUserDao;
 import ru.otus.webServer.dao.UserDao;
@@ -31,6 +32,20 @@ public class Runner {
 
     public static void main(String[] args) throws Exception {
         log.info("Start the application");
+        var dbServiceClient = prepareDB();
+        log.info("Start the template Processor");
+        TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
+        log.info("Start preparing dao");
+        UserDao userDao = new InMemoryUserDao();
+        LoginService loginService = new InMemoryLoginServiceImpl(userDao);
+        log.info("Start the web server");
+        UsersWebServer usersWebServer = new UsersWebServerBase(WEB_SERVER_PORT, templateProcessor, dbServiceClient, loginService);
+        usersWebServer.start();
+        usersWebServer.join();
+        // ...
+    }
+    private static DBServiceClient prepareDB(){
+
         log.info("Start preparing the database");
         var configuration = new Configuration().configure(HIBERNATE_CFG_FILE);
         var dbUrl = configuration.getProperty("hibernate.connection.url");
@@ -47,18 +62,9 @@ public class Runner {
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
         MyCache<String, Client> cache = new MyCache<>();
         var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate, cache);
+        // dbServiceClient.getClient(111);
         log.info("The database was prepared");
 
-
-        log.info("Start the template Processor");
-        TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
-        log.info("Start preparing dao");
-        UserDao userDao = new InMemoryUserDao();
-        LoginService loginService = new InMemoryLoginServiceImpl(userDao);
-        log.info("Start the web server");
-        UsersWebServer usersWebServer = new UsersWebServerBase(WEB_SERVER_PORT, templateProcessor, dbServiceClient, loginService);
-        usersWebServer.start();
-        usersWebServer.join();
-        // ...
+        return dbServiceClient;
     }
 }

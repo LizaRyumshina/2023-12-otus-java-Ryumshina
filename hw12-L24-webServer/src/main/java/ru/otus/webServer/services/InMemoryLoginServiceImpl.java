@@ -26,6 +26,6 @@ public class InMemoryLoginServiceImpl extends AbstractLoginService {
     @Override
     protected UserPrincipal loadUserInfo(String login) {
         Optional<User> dbUser = userDao.findByLogin(login);
-        return dbUser.map(u -> new UserPrincipal(u.getLogin(), new Password(u.getPassword()))).orElse(null);
+        return dbUser.map(u -> new UserPrincipal(u.login(), new Password(u.password()))).orElse(null);
     }
 }

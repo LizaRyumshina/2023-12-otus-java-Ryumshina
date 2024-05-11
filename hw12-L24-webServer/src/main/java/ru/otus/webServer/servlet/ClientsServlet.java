@@ -40,9 +40,7 @@ public class ClientsServlet extends HttpServlet {
         String address = req.getParameter("address");
         String phone = req.getParameter("phone");
         List<Phone> phones = new ArrayList<>();
-        if (phones != null) {
-            phones.add(new Phone(null, phone));
-        }
+        phones.add(new Phone(null, phone));
 
         Client client = new Client(null, name, new Address(null, address), phones);
         dbServiceClient.saveClient(client);

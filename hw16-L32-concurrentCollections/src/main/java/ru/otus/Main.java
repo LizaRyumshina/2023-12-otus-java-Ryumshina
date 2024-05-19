@@ -19,8 +19,7 @@ public class Main {
 
     private static final int SENSORS_DATA_QUEUE_CAPACITY = 1000;
 
-    public static void main(String[] args) throws InterruptedException {
-
+    public static void main(String[] args) throws InterruptedException{
         // канал для передачи данных
         var sensorsDataChannel = new SensorsDataQueueChannel(SENSORS_DATA_QUEUE_CAPACITY);
 

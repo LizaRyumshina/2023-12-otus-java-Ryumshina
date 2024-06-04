@@ -9,7 +9,7 @@ import ru.otus.lib.SensorDataBufferedWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ArrayBlockingQueue;
 
 // Этот класс нужно реализовать
 @SuppressWarnings({"java:S1068", "java:S125"})
@@ -18,13 +18,14 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
 
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
-    private ConcurrentSkipListSet<SensorData> dataBuffer;
+    private ArrayBlockingQueue<SensorData> dataBuffer;
+    private final int SIZE_QUEUE = 10000000;
     private List<SensorData> bufferedData;
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
         this.bufferSize = bufferSize;
         this.writer = writer;
-        dataBuffer = new ConcurrentSkipListSet<>(Comparator.comparing(SensorData::getMeasurementTime));
+        dataBuffer = new ArrayBlockingQueue<>(SIZE_QUEUE);
     }
 
     @Override
@@ -41,16 +42,14 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
         }
     }
 
-    public synchronized void flush() {
+    public void flush() {
         if (dataBuffer.isEmpty()) {
             return;
         }
         try {
             bufferedData = new ArrayList<>();
-            int cnt = Math.min(dataBuffer.size(), bufferSize); // запуск может быть из onProcessingEnd, т.е. не полный набор элементов
-            for (int i = 0; i < cnt; i++) {
-                bufferedData.add(dataBuffer.pollFirst()); // сразу удаляет элемент из очереди
-            }
+            dataBuffer.drainTo(bufferedData);
+            bufferedData.sort(Comparator.comparing(SensorData::getMeasurementTime));
             writer.writeBufferedData(bufferedData);
         } catch (Exception e) {
             log.error("Ошибка в процессе записи буфера", e);

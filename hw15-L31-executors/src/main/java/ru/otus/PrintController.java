@@ -10,32 +10,31 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class PrintController {
     private static final Logger logger = LoggerFactory.getLogger(PrintController.class);
-    private static final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private static final String firstThreadName = "Thread 1";
-    private static boolean isFirstThreadTurn = true;
-    private static final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private String secondThreadName = "Thread 2";
 
     public static void main(String[] args) {
+
         var printer = new PrintController();
-
-        executor.execute(() -> printer.action(firstThreadName));
-        executor.execute(() -> printer.action("Thread 2"));
-
-        executor.shutdown();
+        var thread1 = new Thread(() -> printer.action(printer.getSecondThreadName()));
+        thread1.setName("Thread 1");
+        var thread2 = new Thread(() -> printer.action("Thread 1"));
+        thread2.setName(printer.getSecondThreadName());
+        thread1.start();
+        thread2.start();
 
         logger.info("The main end");
     }
 
-    void action(String threadName) {
+    private void action(String nextThreadName) {
         int value = 1;
         boolean isIncrement = true;
 
         while (!Thread.currentThread().isInterrupted()) {
             lock.writeLock().lock();
             try {
-                if ((threadName.equals(firstThreadName) && isFirstThreadTurn)
-                   ||(!threadName.equals(firstThreadName) && !isFirstThreadTurn)) {
-                    logger.info("{}. My name is {}", value, threadName);
+                if (!nextThreadName.equals(secondThreadName)) {
+                    logger.info("{}. My name is {}", value, nextThreadName);
                     if (isIncrement) {
                         value++;
                     } else {
@@ -44,7 +43,7 @@ public class PrintController {
                     if (value == 10 || value == 1) {
                         isIncrement = !isIncrement;
                     }
-                    isFirstThreadTurn = !isFirstThreadTurn;
+                    secondThreadName = nextThreadName;
                 }
             } finally {
                 lock.writeLock().unlock();
@@ -52,7 +51,9 @@ public class PrintController {
             sleep();
         }
     }
-
+    private String getSecondThreadName() {
+        return secondThreadName;
+    }
     private static void sleep() {
         try {
             Thread.sleep(1_000);

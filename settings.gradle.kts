@@ -13,6 +13,7 @@ include("hw11-L22-cache")
 include("hw12-L24-webServer")
 include("hw13-L25-di")
 include("hw15-L31-executors")
+include("hw16-L32-concurrentCollections")
 
 pluginManagement {
     val jgitver: String by settings
